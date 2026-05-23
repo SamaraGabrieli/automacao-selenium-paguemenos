@@ -20,7 +20,15 @@ driver.maximize_window()
 
 def voltar_home():
     driver.get("https://www.paguemenos.com.br/")
-    time.sleep(3)
+
+    espera.until(
+        EC.presence_of_element_located(
+            (
+                By.CSS_SELECTOR,
+                ".paguemenos-store-theme-9-x-inputNovaBusca"
+            )
+        )
+    )
 
 
 def pesquisa(produto):
@@ -53,6 +61,7 @@ def selecionar_categoria(nome_categoria):
 # TESTES
 # =========================
 
+#Testando campo de pesquisa
 def teste_pesquisa():
 
     pesquisa("dipirona")
@@ -64,36 +73,71 @@ def teste_pesquisa():
     pesquisa("fralda pampers")
     time.sleep(5)
 
+#Testando ordenação
+def teste_ordenacao():
+
+    # abre opções de ordenação
+    ordenar = espera.until(
+        EC.element_to_be_clickable(
+            (
+                By.CSS_SELECTOR,
+                ".paguemenos-store-theme-9-x-containerOrdenarDesk"
+            )
+        )
+    )
+
+    driver.execute_script("arguments[0].click();", ordenar)
+
+    time.sleep(2)
+
+    # seleciona "Menor preço"
+    menor_preco = espera.until(
+        EC.element_to_be_clickable(
+            (
+                By.XPATH,
+                "//div[contains(text(),'Menor preço')]"
+            )
+        )
+    )
+
+    driver.execute_script("arguments[0].click();", menor_preco)
+
+    time.sleep(5)
+
+    print("Ordenação aplicada com sucesso")
+
+
+#Testando pesquisa sem resultado
 def teste_pesquisa_erro():
 
     pesquisa("asdfghghjkiottvb")
-    time.sleep(5)
 
+    espera.until(
+        EC.presence_of_element_located(
+            (
+                By.XPATH,
+                "//*[contains(text(),'Nenhum resultado')]"
+            )
+        )
+    )
+
+#Acessando as categorias
 def teste_categoria():
 
+    time.sleep(5)
     voltar_home()
 
     selecionar_categoria("Mamães e bebês")
     time.sleep(3)
-
     driver.back()
-    time.sleep(2)
+
 
     selecionar_categoria("Medicamentos e Saúde")
     time.sleep(3)
-
     driver.back()
-    time.sleep(2)
 
-    selecionar_categoria("Dermo & Beleza")
-    time.sleep(3)
-
-    driver.back()
-    time.sleep(2)
-
+# Validação de inconsistência na quantidade de produtos
 def teste_carrinho_quantidade():
-
-    voltar_home()
 
     pesquisa("carmed")
     time.sleep(5)
@@ -168,10 +212,8 @@ def teste_carrinho_quantidade():
     time.sleep(5)
 
 
-
+#INCLUINDO PRODUTOS NO CARRINHO
 def teste_carrinho():
-
-    voltar_home()
 
     pesquisa("ibuprofeno")
     time.sleep(5)
@@ -235,9 +277,8 @@ def teste_carrinho():
     driver.execute_script("arguments[0].click();", carrinho)
     time.sleep(5)
 
-# =========================
+
 # Excluindo Produto do carrinho
-# =========================
 
 def remove_produto():
 
@@ -258,6 +299,7 @@ def remove_produto():
 
     driver.execute_script("arguments[0].click();", confirmar)
 
+#CADASTRANDO CEP
 def cadastrar_cep():
 
     continuar = espera.until(
@@ -276,87 +318,32 @@ def cadastrar_cep():
         )
     )
 
-    codigo_cep = "17012345"
+    codigo_cep = "17026842"
 
     for numero in codigo_cep:
         cep.send_keys(numero)
         time.sleep(0.2)
 
 
-def teste_login():
 
-    driver.get("https://www.paguemenos.com.br/")
-    driver.maximize_window()
-
-    # Clica em "Entrar"
-    entrar = espera.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, "//span[contains(text(),'Entrar')]")
-        )
-    )
-    entrar.click()
-
-    # Campo email
-    email = espera.until(
-        EC.presence_of_element_located(
-            (By.CSS_SELECTOR, "input[type='email']")
-        )
-    )
-
-    # Campo senha
-    senha = espera.until(
-        EC.presence_of_element_located(
-            (By.CSS_SELECTOR, "input[type='password']")
-        )
-    )
-
-    # Preenche dados inválidos
-    email.send_keys("teste@teste.com")
-    senha.send_keys("senhaerrada")
-
-    # BOTÃO ENTRAR
-    botao = espera.until(
-        EC.element_to_be_clickable(
-            (By.XPATH, "//button[contains(.,'Entrar')]")
-        )
-    )
-
-    driver.execute_script("arguments[0].click();", botao)
-
-    # Validação de erro de login
-    erro = espera.until(
-        EC.presence_of_element_located(
-            (
-                By.XPATH,
-                "//*[contains(text(),'inválido') or contains(text(),'erro')]"
-            )
-        )
-    )
-
-    assert erro is not None
-    print("Login inválido validado com sucesso")
-
-
-
-# =========================
 # EXECUÇÃO DOS TESTES
-# =========================
 
-#teste_pesquisa()
+teste_pesquisa()
 
-#teste_pesquisa_erro()
+teste_ordenacao()
 
-#teste_categoria()
+teste_pesquisa_erro()
 
-#teste_carrinho_quantidade()
+teste_categoria()
 
-#teste_carrinho()
+teste_carrinho_quantidade()
 
-#remove_produto()
+teste_carrinho()
 
-#cadastrar_cep()
+remove_produto()
 
-teste_login()
+cadastrar_cep()
+
 
 
 

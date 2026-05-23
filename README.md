@@ -10,3 +10,5 @@ Projeto de automação web utilizando Selenium no site da Farmácia Pague Menos.
 - Adição ao carrinho
 - Remoção de produtos
 - Cadastro de CEP
+- Validação de inconsistência na quantidade de produtos
+- Ordenação de produtos por menor preço
